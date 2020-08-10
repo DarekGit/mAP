@@ -1,1 +1,1 @@
-#example of mAP implementation for object detection
+#Example of mAP implementation for object detection
