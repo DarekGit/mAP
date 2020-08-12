@@ -25,18 +25,18 @@ def classify(gts,dts):
         MIoU[i//xg,i%xg]=IoU(gts[i%xg],dts[i//xg])
       TP=[]
       FP=list(np.arange(yd)/1.)
-      TN=list(np.arange(xg)/1.) 
+      FN=list(np.arange(xg)/1.) 
       for i in range(xg): # wyszukanie maksymalnych IoU >0 dla x rzeczywistych twarzy (annotation)
         a=np.argmax(MIoU); k,w =a//xg,a%xg
         if MIoU[k,w]>0:
           TP.append([k/1.,w/1.,MIoU[k,w]]); MIoU[:,w]=0.; MIoU[k,:]=0.
-          FP[k]=-1.; TN[w]=-1.
-      FP=[e for e in FP if e>-1]; TN=[e for e in TN if e>-1]
+          FP[k]=-1.; FN[w]=-1.
+      FP=[e for e in FP if e>-1]; FN=[e for e in FN if e>-1]
   else: #no intersections
     TP=[]
-    if xg>0: TN=list(np.arange(xg)/1.); FP=[] #brak detekcji
-    else: FP=list(np.arange(yd)/1.); TN=[]  #brak anotacji
-  return TP,TN,FP
+    if xg>0: FN=list(np.arange(xg)/1.); FP=[] #brak detekcji
+    else: FP=list(np.arange(yd)/1.); FN=[]  #brak anotacji
+  return TP,FN,FP
 
 #flat list of ground true and detected boxes sorted by decreasing confidence 
 def lists(gbxs,dbxs,conf_t=0):
@@ -128,7 +128,7 @@ def plot_mAP(met,data,keys,r_p=1,title='',file='mAP',figsize=(16,10)):
       legend.append('{:8}:   {:5.2f}% / {:5.2f}%   -  0.5 - 0.95'.format(k,met[k][0]*100,met[k][1]*100))
       ax.plot(0,1)
   title+=' mAP'
-  if r_p==1: title+=' - no estimation' 
+  if r_p==1: title+=' - no inter' 
   plt.legend(legend, loc='lower left')
   ax.set(xlabel='Recall', ylabel='Precission',title=title)
   ax.grid()
